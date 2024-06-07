@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistical Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 300px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Statistical Calculator</h1>
+        <input type="text" id="numbers" placeholder="Enter numbers separated by commas">
+        <button onclick="calculate()">Calculate</button>
+        <div id="result"></div>
+    </div>
+    <script>
+        function calculate() {
+            var input = document.getElementById('numbers').value;
+            var numbers = input.split(',').map(Number).filter(Boolean);
+            if (numbers.length === 0) {
+                document.getElementById('result').innerHTML = 'Please enter valid numbers!';
+                return;
+            }
+            var mean = numbers.reduce((acc, val) => acc + val, 0) / numbers.length;
+            var sortedNumbers = numbers.sort((a, b) => a - b);
+            var median = sortedNumbers.length % 2 === 0 ? (sortedNumbers[sortedNumbers.length / 2 - 1] + sortedNumbers[sortedNumbers.length / 2]) / 2 : sortedNumbers[Math.floor(sortedNumbers.length / 2)];
+            var squaredDifferencesSum = numbers.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0);
+            var variance = squaredDifferencesSum / numbers.length;
+            var standardDeviation = Math.sqrt(variance);
+            var lowerQuartile = findQuartile(sortedNumbers, 0.25);
+            var upperQuartile = findQuartile(sortedNumbers, 0.75);
+            var interquartileRange = upperQuartile - lowerQuartile;
+            document.getElementById('result').innerHTML = `
+                <p>Mean: ${mean.toFixed(2)}</p>
+                <p>Median: ${median.toFixed(2)}</p>
+                <p>Standard Deviation: ${standardDeviation.toFixed(2)}</p>
+                <p>Interquartile Range: ${interquartileRange.toFixed(2)}</p>
+            `;
+        }
+
+        function findQuartile(sortedNumbers, quartile) {
+            var position = quartile * (sortedNumbers.length + 1);
+            var posInteger = Math.trunc(position);
+            if (posInteger === position) {
+                return sortedNumbers[posInteger - 1];
+            } else {
+                var lowerValue = sortedNumbers[Math.floor(position) - 1];
+                var upperValue = sortedNumbers[Math.ceil(position) - 1];
+                return lowerValue + (upperValue - lowerValue) * (position - posInteger);
+            }
+        }
+    </script>
+</body>
+</html>
